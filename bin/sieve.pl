@@ -50,12 +50,14 @@ my $max_number = validate_number($config->{max_number} // 10000000, 'max_number'
 # Initialiseer het DBIx::Class schema object
 my $schema;
 if (defined $config->{db_user}) {
+    my $cs = sprintf("dbi:Pg:dbname=%s;host=%s;port=%s", $config->{db_name}, $config->{db_host}, $config->{db_port});
     $schema = Priem->connect(
-        'dbi:Pg:dbname=' . $config->{db_name}, 
+        $cs,
         $config->{db_user}, 
         $config->{db_password}
     );
 } else {
+    #socket connect...
     $schema = Priem->connect(
         'dbi:Pg:dbname=' . $config->{db_name}, 
     );

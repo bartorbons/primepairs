@@ -35,6 +35,14 @@ sub max_number {
     return $self->{max_number};
 }
 
+sub get_highest_processed_block {
+    my $self = shift;
+
+    my $schema = $self->schema;
+    my $last = $schema->resultset('Voortgang')->search({}, { order_by => { -desc => 'id'}, rows => 1})->first;
+    return $last ? $last->hoogste_blok : 1; #als we al data in de database hebben, beginnen we daar
+}
+
 # Functie die de priemgetallen zoekt
 sub run {
     my $self = shift;
@@ -43,7 +51,8 @@ sub run {
     my $max_number = $self->max_number;
 
     # Haal de hoogste waarde van het verwerkte blok op uit de database
-    my $last_processed_block = 1;  # Dit kun je aanpassen naar een query naar de voortgangstabel
+    my $last_processed_block = $self->get_highest_processed_block();
+    print "We will continue from block $last_processed_block\n";
 
     for (my $start = $last_processed_block + 1; $start <= $max_number; $start += $blok_size) {
         my $end = $start + $blok_size - 1;
